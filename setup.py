@@ -126,7 +126,7 @@ def is_requirement(line):
 
 
 setup(
-    name="edx-enterprise-data",
+    name="2u-enterprise-data",
     version=VERSION,
     classifiers=[
         'Framework :: Django',
@@ -138,7 +138,7 @@ setup(
     long_description="Tools and products related to providing access to Enterprise data.",
     author="edX",
     author_email="oscm@edx.org",
-    url="https://github.com/openedx/edx-enterprise-data",
+    url="https://github.com/edx/2u-enterprise-data",
     packages=[
         'enterprise_data',
         'enterprise_reporting',
