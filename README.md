@@ -1,4 +1,4 @@
-# edx-enterprise-data
+# 2u-enterprise-data
 The edX Enterprise Data repo is the home to tools and products related to providing access to Enterprise related data.
 
 This repository is currently split into 2 folders: enterprise_reporting and enterprise_data
