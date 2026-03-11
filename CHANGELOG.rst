@@ -15,6 +15,14 @@ Unreleased
 ----------
 
 =========================
+[10.22.1] - 2025-10-28
+-----------------------
+  * chore: cutover the repo
+
+[10.22.0] - 2025-10-28
+-----------------------
+  * chore: upgrade python requirements
+
 [10.21.16] - 2025-11-21
 -----------------------
   * feat: filter out unenrollment and update filter order in Learner Progress Report 
