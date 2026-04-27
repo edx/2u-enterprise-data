@@ -180,6 +180,9 @@ class EnterpriseLearnerEnrollmentFactory(factory.django.DjangoModelFactory):
     current_grade = factory.lazy_attribute(
         lambda x: FAKER.pyfloat(right_digits=2, min_value=0, max_value=1)  # pylint: disable=no-member
     )
+    course_passing_grade = factory.lazy_attribute(
+        lambda x: FAKER.pyfloat(right_digits=2, min_value=0, max_value=1)  # pylint: disable=no-member
+    )
     letter_grade = factory.lazy_attribute(lambda x: ' '.join(FAKER.words(nb=2)).title())
     progress_status = factory.lazy_attribute(lambda x: ' '.join(FAKER.words(nb=2)).title())
     enterprise_user_id = factory.Sequence(lambda n: n)
@@ -231,6 +234,7 @@ class EnterpriseLearnerEnrollmentFactory(factory.django.DjangoModelFactory):
             'last_activity_date',
             'progress_status',
             'passed_date',
+            'course_passing_grade',
             'current_grade',
             'letter_grade',
             'enterprise_user_id',

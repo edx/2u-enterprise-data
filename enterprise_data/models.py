@@ -115,6 +115,7 @@ class EnterpriseLearnerEnrollment(models.Model):
     total_learning_time_seconds = models.PositiveIntegerField(default=0)
     progress_status = models.CharField(max_length=255, null=True)
     passed_date = models.DateField(null=True)
+    course_passing_grade = models.FloatField(null=True)
     current_grade = models.FloatField(null=True)
     letter_grade = models.CharField(max_length=64, null=True)
     enterprise_user = models.ForeignKey(

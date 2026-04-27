@@ -15,8 +15,10 @@ from rest_framework.test import APITransactionTestCase
 
 from django.utils import timezone
 
-from enterprise_data.api.v1.serializers import EnterpriseOfferSerializer
+from enterprise_data.api.v1.serializers import EnterpriseLearnerEnrollmentSerializer, EnterpriseOfferSerializer
+from enterprise_data.api.v1.views import enterprise_learner as enterprise_learner_views
 from enterprise_data.models import EnterpriseLearnerEnrollment, EnterpriseOffer
+from enterprise_data.renderers import EnrollmentsCSVRenderer
 from enterprise_data.tests.factories import (
     EnterpriseAdminLearnerProgressFactory,
     EnterpriseAdminSummarizeInsightsFactory,
@@ -211,6 +213,41 @@ class TestEnterpriseLearnerEnrollmentViewSet(JWTTestMixin, APITransactionTestCas
         response = self.client.get(url, data={'search_all': search_term})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()['count'], 0)
+
+    def test_course_passing_grade_in_json_response(self):
+        enterprise_learner = EnterpriseLearnerFactory(
+            enterprise_customer_uuid=self.enterprise_id
+        )
+        learner_enrollment = EnterpriseLearnerEnrollmentFactory(
+            enterprise_customer_uuid=self.enterprise_id,
+            is_consent_granted=True,
+            enterprise_user_id=enterprise_learner.enterprise_user_id,
+            course_passing_grade=0.8,
+            current_grade=0.72,
+        )
+
+        url = reverse('v1:enterprise-learner-enrollment-list', kwargs={'enterprise_id': self.enterprise_id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()['results']
+        matching_result = next(
+            result for result in results if result['enrollment_id'] == learner_enrollment.enrollment_id
+        )
+        self.assertEqual(matching_result['course_passing_grade'], 0.8)
+        response_keys = list(matching_result.keys())
+        self.assertLess(response_keys.index('course_passing_grade'), response_keys.index('current_grade'))
+
+    def test_course_passing_grade_in_csv_header(self):
+        view_header = enterprise_learner_views.EnterpriseLearnerEnrollmentViewSet.header
+        renderer_header = EnrollmentsCSVRenderer.header
+        serializer_fields = list(EnterpriseLearnerEnrollmentSerializer.Meta.fields)
+
+        self.assertIn('course_passing_grade', view_header)
+        self.assertIn('course_passing_grade', renderer_header)
+        self.assertLess(view_header.index('course_passing_grade'), view_header.index('current_grade'))
+        self.assertLess(renderer_header.index('course_passing_grade'), renderer_header.index('current_grade'))
+        self.assertLess(serializer_fields.index('course_passing_grade'), serializer_fields.index('current_grade'))
 
 
 @ddt.ddt

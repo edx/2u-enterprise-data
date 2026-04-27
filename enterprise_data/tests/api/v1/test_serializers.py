@@ -42,6 +42,18 @@ class TestEnterpriseLearnerEnrollmentSerializer(APITransactionTestCase):
         serializer = EnterpriseLearnerEnrollmentSerializer(self.enrollment)
         assert serializer.data['total_learning_time_hours'] == expected_total_learning_time_seconds
 
+    def test_course_passing_grade_before_current_grade(self):
+        self.enrollment.course_passing_grade = 0.7
+        self.enrollment.current_grade = 0.65
+        self.enrollment.save()
+
+        serializer = EnterpriseLearnerEnrollmentSerializer(self.enrollment)
+
+        assert serializer.data['course_passing_grade'] == 0.7
+        assert serializer.data['current_grade'] == 0.65
+        serialized_keys = list(serializer.data.keys())
+        assert serialized_keys.index('course_passing_grade') < serialized_keys.index('current_grade')
+
 
 @ddt.ddt
 class TestEnterpriseOfferSerializer(APITransactionTestCase):

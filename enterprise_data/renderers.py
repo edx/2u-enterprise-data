@@ -23,7 +23,7 @@ class EnrollmentsCSVRenderer(CSVStreamingRenderer):
         'course_title', 'course_pacing_type', 'course_start_date', 'course_end_date',
         'course_duration_weeks', 'course_max_effort', 'course_min_effort',
         'course_primary_program', 'primary_program_type', 'course_primary_subject', 'has_passed',
-        'last_activity_date', 'progress_status', 'passed_date', 'current_grade',
+        'last_activity_date', 'progress_status', 'passed_date', 'course_passing_grade', 'current_grade',
         'letter_grade', 'enterprise_user_id', 'user_email', 'user_account_creation_date',
         'user_country_code', 'user_username', 'user_first_name', 'user_last_name', 'enterprise_name',
         'enterprise_customer_uuid', 'enterprise_sso_uid', 'created', 'course_api_url', 'total_learning_time_hours',
