@@ -1,4 +1,7 @@
 # 2u-enterprise-data
+
+> This is a 2U-owned repository, forked from [openedx/edx-enterprise-data](https://github.com/openedx/edx-enterprise-data). Development happens here; PRs should be opened against `edx/2u-enterprise-data`, not the openedx repo.
+
 The edX Enterprise Data repo is the home to tools and products related to providing access to Enterprise related data.
 
 This repository is currently split into 2 folders: enterprise_reporting and enterprise_data
@@ -18,7 +21,7 @@ This app is meant to be installed as an app in [edx-analytics-data-api](https://
 1. Complete the setup in the README of `edx-analytics-data-api`
 1. Navigate to `edx-analytics-data-api` and activate your virtualenv.
 1. In the `edx-analytics-data-api` folder, run `make requirements`
-1. Run `pip install -e ./src/edx-enterprise-data`
+1. Run `pip install -e ./src/2u-enterprise-data`
 1. Run `./manage.py runserver`
 
 ## Running migrations locally
