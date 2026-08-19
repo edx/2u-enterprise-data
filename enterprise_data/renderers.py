@@ -28,6 +28,8 @@ class EnrollmentsCSVRenderer(CSVStreamingRenderer):
         'user_country_code', 'user_username', 'user_first_name', 'user_last_name', 'enterprise_name',
         'enterprise_customer_uuid', 'enterprise_sso_uid', 'created', 'course_api_url', 'total_learning_time_hours',
         'is_subsidy', 'course_product_line', 'budget_id', 'enterprise_flex_group_name', 'enterprise_flex_group_uuid',
+        'course_progress',
+        'course_passing_grade',
     ]
 
 
@@ -71,6 +73,9 @@ class IndividualEngagementsCSVRenderer(CSVStreamingRenderer):
         'enroll_type',
         'activity_date',
         'learning_time_hours',
+        'is_engaged_video',
+        'is_engaged_forum',
+        'is_engaged_problem',
     ]
 
 

@@ -15,10 +15,19 @@ class FactEngagementAdminDashQueries:
         Get the query to fetch the learning hours and daily sessions.
         """
         return f"""
+            WITH learner_engagement AS (
+                SELECT
+                    email,
+                    ROUND(SUM(learning_time_seconds) / 60 / 60, 1) as learning_time_hours,
+                    SUM(is_engaged) as sessions
+                FROM fact_enrollment_engagement_day_admin_dash
+                WHERE {query_filters.to_sql()}
+                GROUP BY email
+            )
             SELECT
-                ROUND(SUM(learning_time_seconds) / 60 / 60, 1) as hours, SUM(is_engaged) as sessions
-            FROM fact_enrollment_engagement_day_admin_dash
-            WHERE {query_filters.to_sql()};
+                ROUND(SUM(learning_time_hours), 1) as hours,
+                SUM(sessions) as sessions
+            FROM learner_engagement;
         """
 
     @staticmethod
@@ -40,7 +49,8 @@ class FactEngagementAdminDashQueries:
         return f"""
             SELECT
                 email, course_title, course_subject, enroll_type, activity_date,
-                learning_time_seconds/3600 as learning_time_hours
+                learning_time_seconds/3600 as learning_time_hours,
+                is_engaged_video, is_engaged_forum, is_engaged_problem
             FROM fact_enrollment_engagement_day_admin_dash
             WHERE {query_filters.to_sql()}
             ORDER BY activity_date DESC LIMIT %(limit)s OFFSET %(offset)s;

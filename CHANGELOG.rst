@@ -14,14 +14,20 @@ Change Log
 Unreleased
 ----------
 
-=========================
-[10.22.1] - 2025-10-28
+[10.22.2] - 2026-08-19
 -----------------------
-  * chore: cutover the repo
+  * chore: sync with openedx/edx-enterprise-data through 10.22.14 [ENT-12194]
+  * chore: cutover to the 2U-owned fork at edx/2u-enterprise-data
+  * fix: guard against NULL user_email/courserun_key in progress enrichment key
+  * fix: add missing underline to Unreleased changelog section header
 
-[10.22.0] - 2025-10-28
+[10.22.1] - 2026-02-24
 -----------------------
-  * chore: upgrade python requirements
+  * build: remove pinned pip now that pip-tools supports pip 26.0
+
+[10.22.0] - 2026-02-05
+-----------------------
+  * build: support only Django 4
 
 [10.21.16] - 2025-11-21
 -----------------------

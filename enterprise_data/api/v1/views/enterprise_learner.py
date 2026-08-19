@@ -9,6 +9,7 @@ from uuid import UUID
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from django.conf import settings
@@ -19,7 +20,6 @@ from django.db.models.functions import Coalesce
 from django.http import StreamingHttpResponse
 from django.utils import timezone
 
-from enterprise_data.admin_analytics.database.utils import LOGGER
 from enterprise_data.api.v1 import serializers
 from enterprise_data.clients import EnterpriseApiClient
 from enterprise_data.exceptions import EnterpriseApiClientException
@@ -29,8 +29,11 @@ from enterprise_data.renderers import EnrollmentsCSVRenderer
 from enterprise_data.utils import subtract_one_month
 
 from .base import EnterpriseViewSetMixin
+from .lpr_data_source_snowflake import SnowflakeCoursePassingGradeSource, SnowflakeCourseProgressSource
 
 LOGGER = getLogger(__name__)
+
+
 DEFAULT_LEARNER_CACHE_TIMEOUT = 60 * 10
 
 
@@ -40,6 +43,7 @@ class EnterpriseLearnerEnrollmentViewSet(EnterpriseViewSetMixin, viewsets.ReadOn
     """
     serializer_class = serializers.EnterpriseLearnerEnrollmentSerializer
     pagination_class = EnterpriseEnrollmentsPagination
+    renderer_classes = (JSONRenderer, EnrollmentsCSVRenderer)
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = '__all__'
     ordering = ('-last_activity_date',)
@@ -65,6 +69,9 @@ class EnterpriseLearnerEnrollmentViewSet(EnterpriseViewSetMixin, viewsets.ReadOn
         'user_country_code', 'user_username', 'user_first_name', 'user_last_name', 'enterprise_name',
         'enterprise_customer_uuid', 'enterprise_sso_uid', 'created', 'course_api_url', 'total_learning_time_hours',
         'is_subsidy', 'course_product_line', 'budget_id',
+        'enterprise_flex_group_name', 'enterprise_flex_group_uuid',
+        'course_progress',
+        'course_passing_grade',
     ]
 
     # TODO: Remove after we release the streaming csv changes
@@ -76,6 +83,10 @@ class EnterpriseLearnerEnrollmentViewSet(EnterpriseViewSetMixin, viewsets.ReadOn
     def get_queryset(self):
         """
         Returns all learner enrollment records for a given enterprise.
+
+        ``course_progress`` and ``course_passing_grade`` are not columns on
+        ``EnterpriseLearnerEnrollment``, so we add synthetic placeholder columns
+        here and enrich both later from Snowflake in the response path.
         """
         if getattr(self, 'swagger_fake_view', False):
             # queryset just for schema generation metadata
@@ -86,14 +97,26 @@ class EnterpriseLearnerEnrollmentViewSet(EnterpriseViewSetMixin, viewsets.ReadOn
 
         # TODO: Created a ticket ENT0-9531 to add the cache on this viewset
 
-        enrollments = EnterpriseLearnerEnrollment.objects.filter(enterprise_customer_uuid=enterprise_customer_uuid)
+        # Add synthetic placeholder columns so the serialized response shape
+        # always includes `course_progress` and `course_passing_grade`; real
+        # values are merged in later from Snowflake during enrichment.
+        enrollments = EnterpriseLearnerEnrollment.objects.filter(
+            enterprise_customer_uuid=enterprise_customer_uuid,
+        ).exclude(
+            enterprise_user__is_linked=False,
+        ).extra(select={
+            'course_progress': 'NULL',
+            'course_passing_grade': 'NULL',
+        })
         enrollments = self.apply_filters(enrollments)
 
         return enrollments
 
     def list(self, request, *args, **kwargs):
         """
-        Override the list method to handle streaming CSV download.
+        Override the list method to handle streaming CSV download and enrich
+        the ``course_progress`` and ``course_passing_grade`` fields from
+        Snowflake's internal LPR table and course-overviews table respectively.
         """
         if request.accepted_renderer.format == 'csv':
             return StreamingHttpResponse(
@@ -102,17 +125,93 @@ class EnterpriseLearnerEnrollmentViewSet(EnterpriseViewSetMixin, viewsets.ReadOn
                 headers={"Content-Disposition": 'attachment; filename="learner_progress_report.csv"'},
             )
 
-        return super().list(request, *args, **kwargs)
+        response = super().list(request, *args, **kwargs)
+        self._enrich_lpr_fields(response)
+        return response
+
+    def _enrich_course_progress_rows(self, rows):
+        """
+        Enrich serialized enrollment rows with ``course_progress`` fetched from
+        Snowflake's internal LPR table.
+
+        Accepts a list-like collection of serialized row dicts and mutates each
+        matching row in place. Silently skips enrichment on any error so the
+        ORM-backed response is always returned intact.
+        """
+        try:
+            if not rows:
+                return rows
+            enterprise_uuid = self.kwargs['enterprise_id']
+            progress_map = SnowflakeCourseProgressSource().get_course_progress_map(enterprise_uuid, rows)
+            for row in rows:
+                key = (
+                    (row.get('user_email') or '').strip(),
+                    (row.get('courserun_key') or '').strip(),
+                )
+                if key in progress_map:
+                    row['course_progress'] = progress_map[key]
+            return rows
+        except Exception:  # pylint: disable=broad-exception-caught
+            LOGGER.warning('Could not enrich course_progress from Snowflake', exc_info=True)
+            return rows
+
+    def _enrich_lpr_fields(self, response):
+        """
+        Enrich each row in the paginated response with ``course_progress`` and
+        ``course_passing_grade`` fetched from Snowflake.
+
+        Both fields start as ``NULL`` placeholders added by ``get_queryset``.
+        Silently skips enrichment on any error so the ORM response is always
+        returned intact.
+        """
+        results = response.data.get('results', [])
+        self._enrich_course_progress_rows(results)
+        self._enrich_course_passing_grade_rows(results)
+
+    def _enrich_course_passing_grade_rows(self, rows):
+        """
+        Enrich serialized enrollment rows with ``course_passing_grade`` fetched
+        from Snowflake's course overviews table.
+
+        Accepts a list-like collection of serialized row dicts and mutates each
+        matching row in place. Silently skips enrichment on any error so the
+        ORM-backed response is always returned intact.
+        """
+        try:
+            if not rows:
+                return rows
+            # Deduplicate here so we pass a clean list to the source (which also
+            # deduplicates internally, but being explicit avoids unnecessary work).
+            courseruns = list(dict.fromkeys(
+                (row.get('courserun_key') or '').strip()
+                for row in rows
+                if (row.get('courserun_key') or '').strip()
+            ))
+            if not courseruns:
+                return rows
+            grades = SnowflakeCoursePassingGradeSource().get_passing_grade_map(courseruns)
+            for row in rows:
+                courserun = (row.get('courserun_key') or '').strip()
+                if courserun and courserun in grades:
+                    row['course_passing_grade'] = grades[courserun]
+            return rows
+        except Exception:  # pylint: disable=broad-exception-caught
+            LOGGER.warning('Could not enrich course_passing_grade from Snowflake', exc_info=True)
+            return rows
 
     def _stream_serialized_data(self):
         """
-        Stream the serialized data.
+        Stream the serialized data, including Snowflake-backed
+        ``course_progress`` and ``course_passing_grade`` enrichment.
         """
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer_class()
         paginator = Paginator(queryset, per_page=settings.ENROLLMENTS_PAGE_SIZE)
         for page_number in paginator.page_range:
-            yield from serializer(paginator.page(page_number).object_list, many=True).data
+            page_results = list(serializer(paginator.page(page_number).object_list, many=True).data)
+            self._enrich_course_progress_rows(page_results)
+            self._enrich_course_passing_grade_rows(page_results)
+            yield from page_results
 
     # pylint: disable=too-many-statements
     def apply_filters(self, queryset):
@@ -299,7 +398,10 @@ class EnterpriseLearnerEnrollmentViewSet(EnterpriseViewSetMixin, viewsets.ReadOn
         """
         Returns number of enterprise users (enrolled AND not enrolled learners)
         """
-        return EnterpriseLearner.objects.filter(enterprise_customer_uuid=self.kwargs['enterprise_id'])
+        return EnterpriseLearner.objects.filter(
+            enterprise_customer_uuid=self.kwargs['enterprise_id'],
+            is_linked=True,
+        )
 
     def get_max_created_date(self, queryset):
         """
