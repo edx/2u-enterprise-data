@@ -7,7 +7,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   # (Required) Must be the name of the repo, without the owning organization.
-  name: 'edx-enterprise-data'
+  name: '2u-enterprise-data'
   description: "The edX Enterprise Data repo is the home to tools and products related to providing access to Enterprise related data"
   annotations:
     # (Optional) Annotation keys and values can be whatever you want.
