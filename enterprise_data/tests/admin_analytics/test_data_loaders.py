@@ -19,13 +19,15 @@ class TestDataLoaders(TestCase):
         """
         Validate the fetch_max_enrollment_datetime function.
         """
-        with patch('enterprise_data.admin_analytics.data_loaders.run_query') as mock_run_query:
-            mock_run_query.return_value = [[datetime(2024, 7, 26, 21, 38, 48, 298000)]]
+        with patch(
+            'enterprise_data.admin_analytics.data_loaders.EnterpriseLearnerEnrollment.objects.aggregate'
+        ) as mock_aggregate:
+            mock_aggregate.return_value = {'max_created': datetime(2024, 7, 26, 21, 38, 48, 298000)}
 
             max_enrollment_date = fetch_max_enrollment_datetime()
             self.assertEqual(max_enrollment_date.strftime('%Y-%m-%d'), '2024-07-26')
 
             # Validate the case where the query returns an empty result.
-            mock_run_query.return_value = []
+            mock_aggregate.return_value = {'max_created': None}
             max_enrollment_date = fetch_max_enrollment_datetime()
             self.assertIsNone(max_enrollment_date)
