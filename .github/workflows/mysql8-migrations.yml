@@ -60,7 +60,7 @@ jobs:
         DATABASES: default
         DB_ENGINE: django.db.backends.mysql
         DB_USER: root
-        DB_PASSWORD: ""
+        DB_PASS: ""
         DB_HOST: localhost
         DB_PORT: 3306
       run: |
@@ -76,7 +76,7 @@ jobs:
         DB_ENGINE: django.db.backends.mysql
         DB_NAME: db_default
         DB_USER: root
-        DB_PASSWORD: ""
+        DB_PASS: ""
         DB_HOST: localhost
         DB_PORT: 3306
       run: |

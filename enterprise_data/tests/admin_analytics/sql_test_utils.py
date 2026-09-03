@@ -17,6 +17,17 @@ from django.test import TestCase
 from enterprise_data.admin_analytics.database.utils import get_db_connection, run_query
 
 
+def _is_safe_test_database_name(name):
+    """
+    Return True if `name` looks like a database provisioned for tests, not a primary/dev schema.
+
+    These tests run destructive DDL (CREATE TABLE, TRUNCATE, DROP TABLE) directly against
+    `settings.DATABASES`, bypassing Django's test-database swapping. This is a last-resort
+    guardrail against pointing that DDL at a real schema by mistake.
+    """
+    return name.startswith('test_') or name.startswith('db_')
+
+
 def _mysql_available():
     """
     Return True if a connection can be opened to the configured reporting database and it is MySQL.
@@ -24,6 +35,12 @@ def _mysql_available():
     database = getattr(settings, 'ENTERPRISE_REPORTING_DB_ALIAS', 'default')
     if 'mysql' not in settings.DATABASES[database]['ENGINE']:
         return False
+    if not _is_safe_test_database_name(settings.DATABASES[database]['NAME']):
+        raise RuntimeError(
+            f"Refusing to run destructive SQL behavioral tests against database "
+            f"\"{settings.DATABASES[database]['NAME']}\": its name doesn't look like a test database "
+            "(expected a \"test_\" or \"db_\" prefix). Point DB_NAME at a disposable test database."
+        )
     try:
         with closing(get_db_connection(database)):
             return True
@@ -75,7 +92,7 @@ class AnalyticsSQLTestCase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         if not _mysql_available():
-            return
+            raise unittest.SkipTest('A MySQL connection is required for this behavioral SQL test.')
         if cls.table_name is None or cls.table_ddl is None:
             raise NotImplementedError('AnalyticsSQLTestCase subclasses must set table_name and table_ddl.')
         with closing(get_db_connection()) as connection:
@@ -121,6 +138,12 @@ class AnalyticsSQLTestCase(TestCase):
         if not rows:
             return
         columns = list(rows[0].keys())
+        for row in rows:
+            if row.keys() != rows[0].keys():
+                raise ValueError(
+                    f'All row dicts passed to insert_rows must share the same keys. '
+                    f'Expected {sorted(rows[0].keys())}, got {sorted(row.keys())}.'
+                )
         column_list = ', '.join(columns)
         placeholders = ', '.join(['%s'] * len(columns))
         values = [tuple(row[column] for column in columns) for row in rows]
