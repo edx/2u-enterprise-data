@@ -6,6 +6,7 @@ rationale behind this pattern: tests here create controlled rows in a real MySQL
 run the actual production query-builder + run_query, and assert on the returned business
 result rather than on the generated SQL string.
 """
+import functools
 import unittest
 from contextlib import closing
 
@@ -55,8 +56,34 @@ def skip_unless_mysql():
     Behavioral SQL tests are skipped (not failed) when no MySQL connection is available, e.g. the
     default local/SQLite test settings. They run automatically wherever MySQL is configured,
     including the mysql8-migrations CI workflow.
+
+    Unlike `unittest.skipUnless`, the availability check is deferred until the test actually runs,
+    rather than evaluated at decoration time (i.e. at import/collection time). Evaluating it eagerly
+    would open a database connection -- and could raise, if the configured database doesn't look like
+    a test database -- just from importing the module, before any test has been selected to run.
     """
-    return unittest.skipUnless(_mysql_available(), 'A MySQL connection is required for this behavioral SQL test.')
+    def decorator(test_item):
+        @functools.wraps(test_item)
+        def skip_wrapper(*args, **kwargs):
+            if not _mysql_available():
+                raise unittest.SkipTest('A MySQL connection is required for this behavioral SQL test.')
+            return test_item(*args, **kwargs)
+
+        if isinstance(test_item, type):
+            original_setUpClass = test_item.setUpClass.__func__
+
+            @classmethod
+            def setUpClass(cls):
+                if not _mysql_available():
+                    raise unittest.SkipTest('A MySQL connection is required for this behavioral SQL test.')
+                original_setUpClass(cls)
+
+            test_item.setUpClass = setUpClass
+            return test_item
+
+        return skip_wrapper
+
+    return decorator
 
 
 class AnalyticsSQLTestCase(TestCase):
@@ -112,7 +139,7 @@ class AnalyticsSQLTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if _mysql_available() and cls.table_name:
+        if cls.table_name:
             with closing(get_db_connection()) as connection:
                 with closing(connection.cursor()) as cursor:
                     cursor.execute(f'DROP TABLE IF EXISTS {cls.table_name}')
@@ -121,7 +148,7 @@ class AnalyticsSQLTestCase(TestCase):
 
     def setUp(self):
         super().setUp()
-        if _mysql_available() and self.table_name:
+        if self.table_name:
             with closing(get_db_connection()) as connection:
                 with closing(connection.cursor()) as cursor:
                     cursor.execute(f'TRUNCATE TABLE {self.table_name}')
