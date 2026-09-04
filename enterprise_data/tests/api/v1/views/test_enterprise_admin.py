@@ -12,6 +12,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITransactionTestCase
 
+from django.utils.timezone import make_aware
+
 from enterprise_data.admin_analytics.database.filters import (
     FactEngagementAdminDashFilters,
     FactEnrollmentAdminDashFilters,
@@ -175,7 +177,6 @@ class TestEnterpriseAdminAnalyticsAggregatesView(JWTTestMixin, APITransactionTes
             self.engagement_queries.get_learning_hours_and_daily_sessions_query(self.engagement_query_filters): [[
                 100, 10
             ]],
-            'SELECT MAX(created) FROM enterprise_learner_enrollment': [[datetime.strptime('2021-01-01', "%Y-%m-%d")]],
             self.skills_queries.get_unique_skills_gained(self.skills_query_filters): [[30]],
             self.skills_queries.get_upskilled_learners_count(self.skills_filters, self.enroll_filters): [[10]],
             self.skills_queries.get_new_skills_learned_count(self.hist_filters, self.current_filters): [[100]],
@@ -187,7 +188,10 @@ class TestEnterpriseAdminAnalyticsAggregatesView(JWTTestMixin, APITransactionTes
         Test to get admin analytics aggregates.
         """
         url = reverse('v1:enterprise-admin-analytics-aggregates', kwargs={'enterprise_id': self.enterprise_id})
-        with patch('enterprise_data.admin_analytics.data_loaders.run_query', side_effect=self._mock_run_query):
+        with patch(
+            'enterprise_data.api.v1.views.enterprise_admin.fetch_max_enrollment_datetime',
+            return_value=make_aware(datetime.strptime('2021-01-01', "%Y-%m-%d"))
+        ):
             with patch(
                     'enterprise_data.admin_analytics.database.tables.fact_engagement_admin_dash.run_query',
                     side_effect=self._mock_run_query

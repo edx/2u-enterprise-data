@@ -111,7 +111,7 @@ class EnterpriseUserFactory(factory.django.DjangoModelFactory):
 
     enterprise_id = str(FAKER.uuid4())  # pylint: disable=no-member
     lms_user_id = factory.lazy_attribute(lambda x: FAKER.random_int(min=1))  # pylint: disable=no-member
-    enterprise_user_id = factory.lazy_attribute(lambda x: FAKER.random_int(min=1))  # pylint: disable=no-member
+    enterprise_user_id = factory.Sequence(lambda n: n + 1)
     enterprise_sso_uid = factory.lazy_attribute(lambda x: FAKER.text(max_nb_chars=255))  # pylint: disable=no-member
     user_account_creation_timestamp = datetime(2011, 1, 1, tzinfo=pytz.utc)
     user_username = factory.Sequence('robot{}'.format)
