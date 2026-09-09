@@ -298,7 +298,29 @@ class EnterpriseExecEdLCModulePerformanceSerializer(serializers.ModelSerializer)
 
     class Meta:
         model = EnterpriseExecEdLCModulePerformance
-        fields = '__all__'
+        # Do not change the order of fields below without updating the requested column order (ENT-12312).
+        # Order and field names below should match with `ExecEdLCModulePerformanceCSVRenderer.header`
+        fields = (
+            'ocm_lms_user_id', 'first_name', 'last_name', 'username', 'status', 'last_access',
+            'presentation_name', 'presentation_abbreviation', 'module_number', 'module_name',
+            'orientation_module_accessed', 'hours_online', 'final_mark', 'assign_grade',
+            'extensions_requested', 'pass_grade', 'module_grade', 'last_module_release_date',
+            'last_module_end_date', 'all_activities_completed_count', 'all_activities_total_count',
+            'graded_activities_completed_count', 'graded_activities_total_count',
+            'assessment_activities_completed_count', 'assessment_activities_total_count',
+            'course_material_activities_completed_count', 'course_material_activities_total_count',
+            'discussion_forum_activities_completed_count', 'discussion_forum_activities_total_count',
+            'percentage_completed_activities', 'percentage_completed_graded_activities',
+            'avg_after_lo_score', 'avg_before_lo_score', 'avg_lo_percentage_difference', 'company_name',
+            'course_abbreviation', 'course_abbreviation_short', 'course_code', 'course_name',
+            'course_type', 'department', 'enrolment_id', 'enterprise_customer_uuid', 'faculty',
+            'is_internal_subsidy', 'log_viewed', 'module_1_release_date', 'module_performance_unique_id',
+            'ocm_courserun_key', 'ocm_enrollment_id', 'olc_user_id', 'partner_short_name',
+            'presentation_close_date', 'presentation_code', 'presentation_start_date',
+            'product_life_cycle_status', 'product_type', 'promotion_category_name', 'promotion_code',
+            'question_name', 'registration_id', 'school', 'subject_vertical', 'subsidy_transaction_id',
+            'university_abbreviation', 'university_country', 'university_name',
+        )
 
     def get_extensions_requested(self, obj):
         """Return extensions_requested if not None, otherwise return 0"""

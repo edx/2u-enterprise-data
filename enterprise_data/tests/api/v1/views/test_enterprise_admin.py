@@ -23,6 +23,7 @@ from enterprise_data.admin_analytics.database.queries import (
 )
 from enterprise_data.admin_analytics.database.query_filters import ComparisonQueryFilter, QueryFilters
 from enterprise_data.admin_analytics.database.tables import SkillsDailyRollupAdminDashTable
+from enterprise_data.models import EnterpriseExecEdLCModulePerformance
 from enterprise_data.tests.admin_analytics.mock_analytics_data import (
     SKILLS_BY_LEARNING_HOURS,
     TOP_SKILLS,
@@ -416,4 +417,102 @@ class TestEnterpriseBudgetAPI(JWTTestMixin, APITransactionTestCase):
                 'subsidy_access_policy_uuid': '8d6503dd-e40d-42b8-442b-37dd4c5450e3',
                 'subsidy_access_policy_display_name': 'test-budget',
             }
+        ]
+
+
+@mark.django_db
+class TestEnterpriseExecEdLCModulePerformanceViewSet(JWTTestMixin, APITransactionTestCase):
+    """
+    Tests for EnterpriseExecEdLCModulePerformanceViewSet.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory(is_staff=True)
+        role, __ = EnterpriseDataFeatureRole.objects.get_or_create(name=ENTERPRISE_DATA_ADMIN_ROLE)
+        self.role_assignment = EnterpriseDataRoleAssignment.objects.create(
+            role=role,
+            user=self.user
+        )
+        self.client.force_authenticate(user=self.user)
+
+        mocked_get_enterprise_customer = mock.patch(
+            'enterprise_data.filters.EnterpriseApiClient.get_enterprise_customer',
+            return_value=get_dummy_enterprise_api_data()
+        )
+        self.mocked_get_enterprise_customer = mocked_get_enterprise_customer.start()
+        self.addCleanup(mocked_get_enterprise_customer.stop)
+
+        self.enterprise_id = 'ee5e6b3a-069a-4947-bb8d-d2dbc323396c'
+        self.set_jwt_cookie()
+        self.url = reverse('v1:enterprise-admin-module-performance-list', kwargs={'enterprise_id': self.enterprise_id})
+
+    def tearDown(self):
+        super().tearDown()
+        EnterpriseExecEdLCModulePerformance.objects.all().delete()
+
+    def test_results_sorted_by_username_presentation_name_then_module_number(self):
+        """
+        Rows should be grouped by username, then presentation_name, then ordered by
+        module_number ascending -- not alphabetically by module_name, which would sort
+        "Module 10" before "Module 2".
+        """
+        for unique_id, username, module_number, module_name in [
+            ('perf-3', 'learner_a', 10, 'Module 10: Wrap up'),
+            ('perf-1', 'learner_a', 0, 'Honor code'),
+            ('perf-2', 'learner_a', 2, 'Module 2: Leading with positive energy'),
+            ('perf-4', 'learner_b', 0, 'Honor code'),
+        ]:
+            EnterpriseExecEdLCModulePerformance.objects.create(
+                module_performance_unique_id=unique_id,
+                enterprise_customer_uuid=self.enterprise_id,
+                username=username,
+                course_name='Leading With Power',
+                presentation_name='Leading With Power',
+                module_number=module_number,
+                module_name=module_name,
+            )
+
+        response = self.client.get(self.url, data={'no_page': 'true'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert [(row['username'], row['module_number']) for row in response.json()] == [
+            ('learner_a', 0),
+            ('learner_a', 2),
+            ('learner_a', 10),
+            ('learner_b', 0),
+        ]
+
+    def test_results_sorted_across_multiple_presentations_for_same_learner(self):
+        """
+        When a learner has rows in more than one presentation, rows should still be
+        grouped by username first, then sorted by presentation_name, with module_number
+        ordering applied within each presentation.
+        """
+        for unique_id, presentation_name, module_number in [
+            ('perf-1', 'Leading With Power', 1),
+            ('perf-2', 'Leading With Power', 0),
+            ('perf-3', 'Digital Transformation', 1),
+            ('perf-4', 'Digital Transformation', 0),
+        ]:
+            EnterpriseExecEdLCModulePerformance.objects.create(
+                module_performance_unique_id=unique_id,
+                enterprise_customer_uuid=self.enterprise_id,
+                username='learner_a',
+                course_name=presentation_name,
+                presentation_name=presentation_name,
+                module_number=module_number,
+                module_name=f'Module {module_number}',
+            )
+
+        response = self.client.get(self.url, data={'no_page': 'true'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert [
+            (row['username'], row['presentation_name'], row['module_number']) for row in response.json()
+        ] == [
+            ('learner_a', 'Digital Transformation', 0),
+            ('learner_a', 'Digital Transformation', 1),
+            ('learner_a', 'Leading With Power', 0),
+            ('learner_a', 'Leading With Power', 1),
         ]
