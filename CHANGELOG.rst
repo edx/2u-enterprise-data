@@ -14,7 +14,7 @@ Change Log
 Unreleased
 ----------
 
-[10.22.4] - 2026-09-06
+[10.22.4] - 2026-09-10
 -----------------------
   * chore: added Django 5.2 tox and CI compatibility checks
 
