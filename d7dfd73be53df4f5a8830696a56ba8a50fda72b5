@@ -1,0 +1,22 @@
+enterprise_data/__init__.py
+  s_5f1c0ce17c74c3::t_1fdc4682ecfb21 5
+CHANGELOG.rst
+  s_5f1c0ce17c74c3::t_68199f575a41bb 17
+  s_5f1c0ce17c74c3::t_1bf3c29404e587 21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d7dfd73be53df4f5a8830696a56ba8a50fda72b5",
+  "prompts": {},
+  "sessions": {
+    "s_5f1c0ce17c74c3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2bfc852f-e7b9-4d3e-a294-bcaf370e018d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "rgopalrao-sonata-png <rgopalrao-sonata@2u.com>"
+    }
+  }
+}
