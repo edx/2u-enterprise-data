@@ -14,9 +14,13 @@ Change Log
 Unreleased
 ----------
 
-[10.22.3] - 2026-09-06
+[10.22.4] - 2026-09-06
 -----------------------
   * chore: added Django 5.2 tox and CI compatibility checks
+
+[10.22.3] - 2026-09-09
+-----------------------
+  * fix: reorder ExecEd module activity CSV columns and row sort [ENT-12312]
 
 [10.22.2] - 2026-08-19
 -----------------------

@@ -8,8 +8,12 @@ import ddt
 from pytest import mark
 from rest_framework.test import APITransactionTestCase
 
-from enterprise_data.api.v1.serializers import EnterpriseLearnerEnrollmentSerializer, EnterpriseOfferSerializer
-from enterprise_data.renderers import EnrollmentsCSVRenderer
+from enterprise_data.api.v1.serializers import (
+    EnterpriseExecEdLCModulePerformanceSerializer,
+    EnterpriseLearnerEnrollmentSerializer,
+    EnterpriseOfferSerializer,
+)
+from enterprise_data.renderers import EnrollmentsCSVRenderer, ExecEdLCModulePerformanceCSVRenderer
 from enterprise_data.tests.test_utils import (
     EnterpriseLearnerEnrollmentFactory,
     EnterpriseLearnerFactory,
@@ -57,6 +61,17 @@ class TestEnterpriseLearnerEnrollmentSerializer(APITransactionTestCase):
         """CSV header must exactly match serializer field order."""
         serializer_fields = list(EnterpriseLearnerEnrollmentSerializer.Meta.fields)
         assert EnrollmentsCSVRenderer.header == serializer_fields
+
+
+class TestEnterpriseExecEdLCModulePerformanceSerializer(APITransactionTestCase):
+    """
+    Tests for `enterprise_exec_ed_lc_module_performance` API serializer.
+    """
+
+    def test_csv_renderer_header_matches_serializer_field_order(self):
+        """CSV header must exactly match serializer field order."""
+        serializer_fields = list(EnterpriseExecEdLCModulePerformanceSerializer.Meta.fields)
+        assert ExecEdLCModulePerformanceCSVRenderer.header == serializer_fields
 
 
 @ddt.ddt
