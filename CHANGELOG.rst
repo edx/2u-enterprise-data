@@ -14,6 +14,10 @@ Change Log
 Unreleased
 ----------
 
+[10.22.3] - 2026-09-09
+-----------------------
+  * fix: reorder ExecEd module activity CSV columns and row sort [ENT-12312]
+
 [10.22.2] - 2026-08-19
 -----------------------
   * chore: sync with openedx/edx-enterprise-data through 10.22.14 [ENT-12194]

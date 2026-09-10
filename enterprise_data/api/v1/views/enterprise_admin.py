@@ -6,6 +6,7 @@ from datetime import date, datetime
 from edx_rbac.decorators import permission_required
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import filters, viewsets
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
 from rest_framework.views import APIView
@@ -24,6 +25,7 @@ from enterprise_data.models import (
     EnterpriseGroupMembership,
     EnterpriseSubsidyBudget,
 )
+from enterprise_data.renderers import ExecEdLCModulePerformanceCSVRenderer
 from enterprise_data.utils import timer
 
 from .base import EnterpriseViewSetMixin
@@ -237,9 +239,10 @@ class EnterpriseExecEdLCModulePerformanceViewSet(EnterpriseViewSetMixin, viewset
     View to for getting enterprise exec ed learner module performance records.
     """
     serializer_class = serializers.EnterpriseExecEdLCModulePerformanceSerializer
+    renderer_classes = (JSONRenderer, ExecEdLCModulePerformanceCSVRenderer)
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     ordering_fields = '__all__'
-    ordering = ['username', 'module_name', 'last_access']
+    ordering = ['username', 'presentation_name', 'module_number']
     search_fields = (
         'username',
         'course_name'
