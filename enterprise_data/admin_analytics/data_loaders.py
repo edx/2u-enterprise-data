@@ -24,5 +24,5 @@ def fetch_max_enrollment_datetime():
     if not max_created:
         return None
     if is_naive(max_created):
-        max_created = make_aware(max_created)
+        max_created = make_aware(max_created, timezone.utc)
     return max_created.astimezone(timezone.utc)

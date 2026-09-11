@@ -2,7 +2,7 @@
 Test cases for enterprise_admin views
 """
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest import mock
 
 import ddt
@@ -11,8 +11,6 @@ from pytest import mark
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITransactionTestCase
-
-from django.utils.timezone import make_aware
 
 from enterprise_data.admin_analytics.database.filters import (
     FactEngagementAdminDashFilters,
@@ -190,7 +188,7 @@ class TestEnterpriseAdminAnalyticsAggregatesView(JWTTestMixin, APITransactionTes
         url = reverse('v1:enterprise-admin-analytics-aggregates', kwargs={'enterprise_id': self.enterprise_id})
         with patch(
             'enterprise_data.api.v1.views.enterprise_admin.fetch_max_enrollment_datetime',
-            return_value=make_aware(datetime.strptime('2021-01-01', "%Y-%m-%d"))
+            return_value=datetime(2021, 1, 1, tzinfo=timezone.utc)
         ):
             with patch(
                     'enterprise_data.admin_analytics.database.tables.fact_engagement_admin_dash.run_query',
