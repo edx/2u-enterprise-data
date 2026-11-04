@@ -1,0 +1,19 @@
+.github/workflows/commitlint.yml
+  s_dc105e874ab4ed::t_b5e78f3031876c 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d71831c14a487a66fa5b0edc7e9c6a1765bb15fb",
+  "prompts": {},
+  "sessions": {
+    "s_dc105e874ab4ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6dd495c5-cb5d-4128-9cd4-c9a8ddc89f48",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "rgopalrao-sonata-png <rgopalrao-sonata@2u.com>"
+    }
+  }
+}
