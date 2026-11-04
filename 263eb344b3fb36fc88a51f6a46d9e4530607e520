@@ -1,0 +1,19 @@
+.github/workflows/mysql8-migrations.yml
+  s_ccd7a3f3d4499a::t_7adcbe3e67cde1 51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "263eb344b3fb36fc88a51f6a46d9e4530607e520",
+  "prompts": {},
+  "sessions": {
+    "s_ccd7a3f3d4499a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd3568f9-03bd-4307-acc0-937f2a21114e",
+        "model": "unknown"
+      },
+      "human_author": "Hamzah Ullah <hamzahullah@yahoo.com>"
+    }
+  }
+}

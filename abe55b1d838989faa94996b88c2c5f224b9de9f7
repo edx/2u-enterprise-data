@@ -1,0 +1,36 @@
+enterprise_data/tests/api/v1/test_serializers.py
+  s_33c7d56d54fdc7::t_984d5bdfd79c9a 66-76
+  s_33c7d56d54fdc7::t_dfbc21043249ec 11-16
+enterprise_data/renderers.py
+  s_33c7d56d54fdc7::t_f4b0ed8474bc09 82-112
+enterprise_data/api/v1/serializers.py
+  s_33c7d56d54fdc7::t_1b58ac12006632 301-323
+enterprise_data/api/v1/views/enterprise_admin.py
+  s_33c7d56d54fdc7::t_ee4eeab224753f 242,245
+  s_33c7d56d54fdc7::t_fdc8edec5dc5f2 28
+  s_33c7d56d54fdc7::t_7e6a0997788174 9
+enterprise_data/tests/api/v1/views/test_enterprise_admin.py
+  s_33c7d56d54fdc7::t_1946ed880f3701 26
+  s_33c7d56d54fdc7::t_1c2d54c4300d1b 485-518
+  s_33c7d56d54fdc7::t_b91f67c8a5a0dd 421-484
+CHANGELOG.rst
+  s_33c7d56d54fdc7::t_b26c981ca428b5 17-20
+enterprise_data/__init__.py
+  s_33c7d56d54fdc7::t_5845ee2e71d9e3 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "abe55b1d838989faa94996b88c2c5f224b9de9f7",
+  "prompts": {},
+  "sessions": {
+    "s_33c7d56d54fdc7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e417f83f-c58f-4035-a1c0-58bb34e93e76",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": null
+    }
+  }
+}
