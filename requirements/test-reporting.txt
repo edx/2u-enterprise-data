@@ -6,6 +6,8 @@
 #
 amqp==5.4.2
     # via kombu
+asn1crypto==1.5.1
+    # via snowflake-connector-python
 awscli==1.46.2
     # via -r requirements/reporting.in
 bcrypt==5.0.0
@@ -13,11 +15,14 @@ bcrypt==5.0.0
 billiard==4.3.2
     # via celery
 boto3==1.43.123
-    # via -r requirements/reporting.in
+    # via
+    #   -r requirements/reporting.in
+    #   snowflake-connector-python
 botocore==1.43.123
     # via
     #   boto3
     #   s3transfer
+    #   snowflake-connector-python
 cachetools==7.2.8
     # via tox
 celery==5.3.6
@@ -26,12 +31,15 @@ certifi==2026.10.23
     # via
     #   py2neo
     #   requests
+    #   snowflake-connector-python
 cffi==2.1.1
     # via
     #   cryptography
     #   pynacl
 charset-normalizer==3.5.2
-    # via requests
+    # via
+    #   requests
+    #   snowflake-connector-python
 click==8.5.0
     # via
     #   celery
@@ -55,6 +63,7 @@ cryptography==50.0.2
     #   -r requirements/reporting.in
     #   paramiko
     #   pgpy
+    #   pyopenssl
     #   snowflake-connector-python
 ddt==1.1.2
     # via -r requirements/test-reporting.in
@@ -65,10 +74,13 @@ docutils==0.19
 filelock==4.2.6
     # via
     #   python-discovery
+    #   snowflake-connector-python
     #   tox
     #   virtualenv
 idna==3.20
-    # via requests
+    # via
+    #   requests
+    #   snowflake-connector-python
 iniconfig==2.3.1
     # via pytest
 interchange==2021.0.4
@@ -92,6 +104,7 @@ packaging==26.3
     #   py2neo
     #   pyproject-api
     #   pytest
+    #   snowflake-connector-python
     #   tox
     #   virtualenv
 pansi==2024.11.0
@@ -106,6 +119,7 @@ pillow==13.0.0
     # via pansi
 platformdirs==4.14.3
     # via
+    #   snowflake-connector-python
     #   tox
     #   virtualenv
 pluggy==1.7.0
@@ -114,8 +128,6 @@ pluggy==1.7.0
     #   tox
 prompt-toolkit==3.0.53
     # via click-repl
-protobuf==6.33.6
-    # via snowflake-connector-python
 py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
     # via -r requirements/reporting.in
 pyasn1==0.6.5
@@ -126,10 +138,14 @@ pycparser==3.12
     # via cffi
 pygments==2.21.0
     # via py2neo
+pyjwt==2.15.1
+    # via snowflake-connector-python
 pyminizip==0.2.6
     # via -r requirements/reporting.in
 pynacl==1.6.2
     # via paramiko
+pyopenssl==26.4.0
+    # via snowflake-connector-python
 pyproject-api==1.12.2
     # via tox
 pytest==8.0.2
@@ -157,7 +173,9 @@ pyyaml==6.0.3
     #   awscli
     #   responses
 requests==2.34.2
-    # via responses
+    # via
+    #   responses
+    #   snowflake-connector-python
 responses==0.26.3
     # via -r requirements/test-reporting.in
 rsa==4.7.2
@@ -171,8 +189,12 @@ six==1.17.0
     #   py2neo
     #   python-dateutil
     #   vertica-python
-snowflake-connector-python==5.1.0
-    # via -r requirements/reporting.in
+snowflake-connector-python==4.8.1
+    # via
+    #   -c requirements/constraints.txt
+    #   -r requirements/reporting.in
+sortedcontainers==2.4.0
+    # via snowflake-connector-python
 tomli-w==1.2.0
     # via tox
 tomlkit==0.15.2
@@ -182,6 +204,8 @@ tox==4.67.5
 typing-extensions==4.16.0
     # via
     #   click-repl
+    #   pyopenssl
+    #   snowflake-connector-python
     #   tox
 tzdata==2026.6
     # via
