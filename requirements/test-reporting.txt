@@ -8,22 +8,22 @@ amqp==5.4.2
     # via kombu
 asn1crypto==1.5.1
     # via snowflake-connector-python
-awscli==1.46.2
+awscli==1.46.3
     # via -r requirements/reporting.in
 bcrypt==5.0.0
     # via paramiko
 billiard==4.3.2
     # via celery
-boto3==1.43.124
+boto3==1.43.126
     # via
     #   -r requirements/reporting.in
     #   snowflake-connector-python
-botocore==1.43.124
+botocore==1.43.126
     # via
     #   boto3
     #   s3transfer
     #   snowflake-connector-python
-cachetools==7.2.8
+cachetools==8.0.0
     # via tox
 celery==5.3.6
     # via -r requirements/reporting.in
@@ -40,7 +40,7 @@ charset-normalizer==3.5.2
     # via
     #   requests
     #   snowflake-connector-python
-click==8.5.0
+click==8.5.1
     # via
     #   celery
     #   click-didyoumean
@@ -145,7 +145,7 @@ pynacl==1.6.2
     # via paramiko
 pyopenssl==26.4.0
     # via snowflake-connector-python
-pyproject-api==1.12.4
+pyproject-api==1.12.5
     # via tox
 pytest==8.0.2
     # via
@@ -159,7 +159,7 @@ python-dateutil==2.9.0.post0
     #   botocore
     #   celery
     #   vertica-python
-python-discovery==1.9.4
+python-discovery==1.9.5
     # via
     #   tox
     #   virtualenv
@@ -198,7 +198,7 @@ tomli-w==1.2.0
     # via tox
 tomlkit==0.15.2
     # via snowflake-connector-python
-tox==4.67.11
+tox==4.67.13
     # via -r requirements/test-reporting.in
 typing-extensions==4.16.0
     # via
@@ -224,7 +224,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==21.15.5
+virtualenv==21.15.6
     # via tox
 wcwidth==0.9.4
     # via prompt-toolkit
