@@ -10,17 +10,17 @@ asgiref==3.13.0
     # via django
 asn1crypto==1.5.1
     # via snowflake-connector-python
-awscli==1.46.2
+awscli==1.46.3
     # via -r requirements/reporting.in
 bcrypt==5.0.0
     # via paramiko
 billiard==4.3.2
     # via celery
-boto3==1.43.124
+boto3==1.44.0
     # via
     #   -r requirements/reporting.in
     #   snowflake-connector-python
-botocore==1.43.124
+botocore==1.44.0
     # via
     #   boto3
     #   s3transfer
@@ -40,7 +40,7 @@ charset-normalizer==3.5.2
     # via
     #   requests
     #   snowflake-connector-python
-click==8.5.0
+click==8.5.1
     # via
     #   celery
     #   click-didyoumean
@@ -119,7 +119,7 @@ edx-django-utils==8.1.0
     #   -r requirements/base.in
     #   edx-drf-extensions
     #   edx-rest-api-client
-edx-drf-extensions==10.10.0
+edx-drf-extensions==10.11.0
     # via
     #   -r requirements/base.in
     #   -r requirements/test-master.in
@@ -128,17 +128,17 @@ edx-opaque-keys==4.0.1
     # via
     #   -r requirements/base.in
     #   edx-drf-extensions
-edx-rbac==3.0.0
+edx-rbac==3.1.0
     # via -r requirements/base.in
-edx-rest-api-client==7.1.0
+edx-rest-api-client==7.1.2
     # via -r requirements/base.in
 factory-boy==3.3.3
     # via
     #   -r requirements/base.in
     #   -r requirements/test.in
-faker==40.44.0
+faker==40.54.0
     # via factory-boy
-filelock==4.2.9
+filelock==4.2.10
     # via snowflake-connector-python
 flaky==3.8.1
     # via -r requirements/test.in
