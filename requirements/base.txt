@@ -10,17 +10,17 @@ asgiref==3.13.0
     # via django
 asn1crypto==1.5.1
     # via snowflake-connector-python
-awscli==1.46.2
+awscli==1.46.3
     # via -r requirements/reporting.in
 bcrypt==5.0.0
     # via paramiko
 billiard==4.3.2
     # via celery
-boto3==1.43.124
+boto3==1.44.5
     # via
     #   -r requirements/reporting.in
     #   snowflake-connector-python
-botocore==1.43.124
+botocore==1.44.5
     # via
     #   boto3
     #   s3transfer
@@ -40,7 +40,7 @@ charset-normalizer==3.5.2
     # via
     #   requests
     #   snowflake-connector-python
-click==8.5.0
+click==8.5.1
     # via
     #   celery
     #   click-didyoumean
@@ -108,12 +108,12 @@ docutils==0.19
     # via awscli
 drf-jwt==1.19.2
     # via edx-drf-extensions
-edx-django-utils==8.1.0
+edx-django-utils==8.2.0
     # via
     #   -r requirements/base.in
     #   edx-drf-extensions
     #   edx-rest-api-client
-edx-drf-extensions==10.10.0
+edx-drf-extensions==10.11.0
     # via
     #   -r requirements/base.in
     #   edx-rbac
@@ -121,15 +121,15 @@ edx-opaque-keys==4.0.1
     # via
     #   -r requirements/base.in
     #   edx-drf-extensions
-edx-rbac==3.0.0
+edx-rbac==3.1.0
     # via -r requirements/base.in
-edx-rest-api-client==7.1.0
+edx-rest-api-client==7.1.2
     # via -r requirements/base.in
 factory-boy==3.3.3
     # via -r requirements/base.in
-faker==40.44.0
+faker==40.54.0
     # via factory-boy
-filelock==4.2.9
+filelock==4.2.12
     # via snowflake-connector-python
 idna==3.20
     # via
@@ -164,7 +164,7 @@ pgpy==0.6.0
     # via -r requirements/reporting.in
 pillow==13.0.0
     # via pansi
-platformdirs==4.14.5
+platformdirs==4.14.7
     # via snowflake-connector-python
 prompt-toolkit==3.0.53
     # via click-repl
@@ -188,7 +188,7 @@ pyjwt[crypto]==2.15.1
     #   snowflake-connector-python
 pyminizip==0.2.6
     # via -r requirements/reporting.in
-pymongo==4.19.0
+pymongo==4.20.0
     # via edx-opaque-keys
 pynacl==1.6.2
     # via
@@ -238,7 +238,7 @@ sortedcontainers==2.4.0
     # via snowflake-connector-python
 sqlparse==0.6.1
     # via django
-stevedore==5.9.1
+stevedore==5.10.0
     # via
     #   edx-django-utils
     #   edx-opaque-keys
